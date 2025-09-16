@@ -57,9 +57,9 @@ function convertKeywordsNumbered(data, headers, keywordsCol) {
         maxKeywords = Math.max(maxKeywords, keywords.length);
     });
     
-    // Get columns to keep (excluding keywords column and Unnamed columns)
-    const columnsToKeep = headers.filter(col => 
-        col !== keywordsCol && !col.toLowerCase().startsWith('unnamed')
+    // Get columns to keep (excluding keywords column, Unnamed columns, and the first column since it becomes the empty column)
+    const columnsToKeep = headers.filter((col, index) => 
+        col !== keywordsCol && !col.toLowerCase().startsWith('unnamed') && index !== 0
     );
     
     // Create new headers with empty first column, then other columns, then numbered keyword columns
@@ -110,9 +110,9 @@ function convertKeywordsSameName(data, headers, keywordsCol) {
         maxKeywords = Math.max(maxKeywords, keywords.length);
     });
     
-    // Get other columns (excluding keywords column and Unnamed columns)
-    const otherColumns = headers.filter(col => 
-        col !== keywordsCol && !col.toLowerCase().startsWith('unnamed')
+    // Get other columns (excluding keywords column, Unnamed columns, and the first column since it becomes the empty column)
+    const otherColumns = headers.filter((col, index) => 
+        col !== keywordsCol && !col.toLowerCase().startsWith('unnamed') && index !== 0
     );
     
     // Create header row with empty first column, then other columns, then repeated keyword columns
