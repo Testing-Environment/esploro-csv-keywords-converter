@@ -8,7 +8,4 @@ Convert CSV files from @@ delimited keywords to multiple columns format.
 - Command line tool for batch processing
 - Support for both numbered and same-name columns
 
-## Quick Start
-[Installation and usage instructions]
-
-## Web Interface
+## Esploro Support Team | Copyright 2025
