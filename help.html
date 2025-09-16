@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help - CSV Keywords Converter</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">CSV Keywords Converter</a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1>Help & Documentation</h1>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <h3>File Requirements</h3>
+                <ul>
+                    <li>File must be in CSV format (.csv)</li>
+                    <li>Must contain a column with "keyword" in the name</li>
+                    <li>Keywords should be separated by @@ delimiter</li>
+                    <li>Maximum file size: 10MB</li>
+                </ul>
+
+                <h3>How Keywords Are Split</h3>
+                <p>The tool looks for any column containing "keyword" in its name and splits the content on the @@ delimiter.</p>
+                
+                <h3>Output Options</h3>
+                <ol>
+                    <li><strong>Same Column Names:</strong> Creates multiple columns all named the same (e.g., "keywords", "keywords", "keywords")</li>
+                    <li><strong>Numbered Columns:</strong> Creates numbered columns (e.g., "keywords", "keywords_2", "keywords_3")</li>
+                </ol>
+
+                <h3>How to Use</h3>
+                <ol>
+                    <li>Click "Choose File" or drag and drop your CSV file</li>
+                    <li>Select your preferred conversion type</li>
+                    <li>Click "Convert File" to process</li>
+                    <li>Your converted file will automatically download</li>
+                </ol>
+
+                <h3>Supported Browsers</h3>
+                <p>This tool works in all modern browsers including Chrome, Firefox, Safari, and Edge. No server upload required - all processing happens locally in your browser.</p>
+
+                <h3>Privacy</h3>
+                <p>Your CSV files are processed entirely in your browser and never uploaded to any server. Your data stays private and secure.</p>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a href="index.html" class="btn btn-primary">← Back to Converter</a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
