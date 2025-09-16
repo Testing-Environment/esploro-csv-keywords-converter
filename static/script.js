@@ -62,8 +62,8 @@ function convertKeywordsNumbered(data, headers, keywordsCol) {
         col !== keywordsCol && !col.toLowerCase().startsWith('unnamed')
     );
     
-    // Create new headers with null first column, then other columns, then numbered keyword columns
-    const newHeaders = [null, ...columnsToKeep];
+    // Create new headers with empty first column, then other columns, then numbered keyword columns
+    const newHeaders = ['', ...columnsToKeep];
     for (let i = 0; i < maxKeywords; i++) {
         if (i === 0) {
             newHeaders.push(keywordsCol);
@@ -78,7 +78,7 @@ function convertKeywordsNumbered(data, headers, keywordsCol) {
         
         // First column value (from original first column)
         const firstColValue = row[headers[0]] || '';
-        newRow[null] = firstColValue;
+        newRow[''] = firstColValue;
         
         // Copy other columns (excluding keywords and unnamed columns)
         columnsToKeep.forEach(header => {
@@ -115,8 +115,8 @@ function convertKeywordsSameName(data, headers, keywordsCol) {
         col !== keywordsCol && !col.toLowerCase().startsWith('unnamed')
     );
     
-    // Create header row with null first column, then other columns, then repeated keyword columns
-    const newHeaders = [null, ...otherColumns, ...Array(maxKeywords).fill(keywordsCol)];
+    // Create header row with empty first column, then other columns, then repeated keyword columns
+    const newHeaders = ['', ...otherColumns, ...Array(maxKeywords).fill(keywordsCol)];
     
     // Create new data rows as arrays to handle duplicate column names
     const newData = data.map((row, rowIndex) => {
@@ -174,8 +174,8 @@ function arrayToCSV(headers, data, result) {
         return field;
     };
     
-    // Write header - convert null to empty string
-    let csv = headers.map(header => escapeCsvField(header === null ? '' : header)).join(',') + '\n';
+    // Write header
+    let csv = headers.map(header => escapeCsvField(header)).join(',') + '\n';
     
     // Write data rows
     data.forEach(row => {
@@ -186,10 +186,7 @@ function arrayToCSV(headers, data, result) {
             rowArray = row.map(field => escapeCsvField(field));
         } else {
             // Standard object-based data (for numbered columns)
-            rowArray = headers.map(header => {
-                const key = header === null ? null : header;
-                return escapeCsvField(row[key] || '');
-            });
+            rowArray = headers.map(header => escapeCsvField(row[header] || ''));
         }
         
         csv += rowArray.join(',') + '\n';
@@ -270,6 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const convertBtn = document.getElementById('convert-btn');
     const uploadForm = document.getElementById('upload-form');
     const uploadText = document.getElementById('upload-text');
+    const chooseFileBtn = document.getElementById('choose-file-btn');
 
     // File input change handler
     fileInput.addEventListener('change', function() {
@@ -306,9 +304,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Click to upload
-    uploadArea.addEventListener('click', function() {
+    // Choose file button click handler
+    chooseFileBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         fileInput.click();
+    });
+
+    // Click to upload area (but not the button)
+    uploadArea.addEventListener('click', function(e) {
+        // Only trigger file input if the click wasn't on the button
+        if (e.target !== chooseFileBtn && !chooseFileBtn.contains(e.target)) {
+            fileInput.click();
+        }
     });
 
     // Form submission handler
