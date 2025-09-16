@@ -9,3 +9,4 @@ Convert CSV files from @@ delimited keywords to multiple columns format.
 - Support for both numbered and same-name columns
 
 ## Esploro Support Team | Copyright 2025
+https://github.com/Testing-Environment/esploro-csv-keywords-converter
