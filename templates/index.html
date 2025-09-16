@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Keywords Converter</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .upload-area {
+            border: 2px dashed #007bff;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        .upload-area:hover {
+            background-color: #e3f2fd;
+            border-color: #0056b3;
+        }
+        .upload-area.dragover {
+            background-color: #e3f2fd;
+            border-color: #0056b3;
+        }
+        .feature-card {
+            transition: transform 0.2s;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .example-table {
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <strong>CSV Keywords Converter</strong>
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="#how-it-works">How it Works</a>
+                <a class="nav-link" href="#examples">Examples</a>
+                <a class="nav-link" href="/help">Help</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h1 class="display-4">CSV Keywords Converter</h1>
+                <p class="lead">Convert @@ delimited keywords to separate columns instantly</p>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Upload Section -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h3 class="card-title text-center mb-4">Upload Your CSV File</h3>
+                        
+                        <form action="/upload" method="post" enctype="multipart/form-data" id="upload-form">
+                            <div class="upload-area mb-3" id="upload-area">
+                                <div class="mb-3">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                                    <h5>Drop your CSV file here or click to browse</h5>
+                                    <p class="text-muted">Supports CSV files up to 10MB</p>
+                                </div>
+                                <input type="file" class="form-control" name="file" id="file-input" accept=".csv" required style="display: none;">
+                                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('file-input').click();">
+                                    Choose File
+                                </button>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Conversion Type:</strong></label>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="conversion_type" value="same_name" id="same_name" checked>
+                                            <label class="form-check-label" for="same_name">
+                                                <strong>Same Column Names</strong><br>
+                                                <small class="text-muted">keywords, keywords, keywords</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="conversion_type" value="numbered" id="numbered">
+                                            <label class="form-check-label" for="numbered">
+                                                <strong>Numbered Columns</strong><br>
+                                                <small class="text-muted">keywords, keywords_2, keywords_3</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg" id="convert-btn" disabled>
+                                    <i class="fas fa-magic me-2"></i>Convert File
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How it Works Section -->
+        <div class="row mb-5" id="how-it-works">
+            <div class="col-12">
+                <h3 class="text-center mb-4">How It Works</h3>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card feature-card h-100">
+                            <div class="card-body text-center">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                    <strong>1</strong>
+                                </div>
+                                <h5>Upload CSV</h5>
+                                <p class="text-muted">Upload your CSV file with @@ delimited keywords in any column</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card feature-card h-100">
+                            <div class="card-body text-center">
+                                <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                    <strong>2</strong>
+                                </div>
+                                <h5>Auto Convert</h5>
+                                <p class="text-muted">Our tool automatically splits keywords and creates separate columns</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card feature-card h-100">
+                            <div class="card-body text-center">
+                                <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                    <strong>3</strong>
+                                </div>
+                                <h5>Download</h5>
+                                <p class="text-muted">Download your converted CSV with keywords in separate columns</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Examples Section -->
+        <div class="row mb-5" id="examples">
+            <div class="col-12">
+                <h3 class="text-center mb-4">Example Conversion</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="text-center">Before (Input)</h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered example-table">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>ASSET_KEYWORDS</th>
+                                        <th>Title</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>keyword1@@keyword2@@keyword3</td>
+                                        <td>Sample Item 1</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>word1@@word2</td>
+                                        <td>Sample Item 2</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="text-center">After (Output)</h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered example-table">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>ASSET_KEYWORDS</th>
+                                        <th>ASSET_KEYWORDS</th>
+                                        <th>ASSET_KEYWORDS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Sample Item 1</td>
+                                        <td>keyword1</td>
+                                        <td>keyword2</td>
+                                        <td>keyword3</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Sample Item 2</td>
+                                        <td>word1</td>
+                                        <td>word2</td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container text-center">
+            <p>&copy; 2025 CSV Keywords Converter. Made with ❤️ for data processing.</p>
+            <p><a href="https://github.com/yourusername/csv-keywords-converter" class="text-light">View on GitHub</a></p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script>
+        // File upload handling
+        const fileInput = document.getElementById('file-input');
+        const uploadArea = document.getElementById('upload-area');
+        const convertBtn = document.getElementById('convert-btn');
+
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                const fileName = this.files[0].name;
+                uploadArea.querySelector('h5').textContent = `Selected: ${fileName}`;
+                convertBtn.disabled = false;
+            }
+        });
+
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].name.endsWith('.csv')) {
+                fileInput.files = files;
+                const fileName = files[0].name;
+                this.querySelector('h5').textContent = `Selected: ${fileName}`;
+                convertBtn.disabled = false;
+            }
+        });
+
+        // Click to upload
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+    </script>
+</body>
+</html>
