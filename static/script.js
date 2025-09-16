@@ -143,6 +143,79 @@ function convertKeywordsSameName(data, headers, keywordsCol) {
     return { headers: newHeaders, data: newData, keywordCount: maxKeywords, isArray: true };
 }
 
+function convertKeywordsHashtagSeparate(data, headers, keywordsCol) {
+    // Split keywords by @@ delimiter and separate hashtag vs regular keywords
+    const regularKeywordLists = [];
+    const hashtagKeywordLists = [];
+    let maxRegularKeywords = 0;
+    
+    data.forEach(row => {
+        const keywordsStr = row[keywordsCol] || '';
+        const allKeywords = keywordsStr ? keywordsStr.split('@@').map(kw => kw.trim()).filter(kw => kw) : [];
+        
+        const regularKeywords = [];
+        const hashtagKeywords = [];
+        
+        allKeywords.forEach(kw => {
+            if (kw.startsWith('#')) {
+                hashtagKeywords.push(kw);
+            } else {
+                regularKeywords.push(kw);
+            }
+        });
+        
+        regularKeywordLists.push(regularKeywords);
+        hashtagKeywordLists.push(hashtagKeywords);
+        maxRegularKeywords = Math.max(maxRegularKeywords, regularKeywords.length);
+    });
+    
+    // Get other columns (excluding keywords column, Unnamed columns, and the first column since it becomes the empty column)
+    const otherColumns = headers.filter((col, index) => 
+        col !== keywordsCol && !col.toLowerCase().startsWith('unnamed') && index !== 0
+    );
+    
+    // Create header row with empty first column, then other columns, then numbered regular keyword columns, then final asset_keywords column
+    const newHeaders = ['', ...otherColumns];
+    for (let i = 0; i < maxRegularKeywords; i++) {
+        if (i === 0) {
+            newHeaders.push(keywordsCol);
+        } else {
+            newHeaders.push(`${keywordsCol}_${i + 1}`);
+        }
+    }
+    // Add final asset_keywords column for hashtags
+    newHeaders.push('asset_keywords');
+    
+    // Create new data rows
+    const newData = data.map((row, rowIndex) => {
+        const newRow = {};
+        
+        // First column value (from original first column)
+        const firstColValue = row[headers[0]] || '';
+        newRow[''] = firstColValue;
+        
+        // Copy other columns (excluding keywords and unnamed columns)
+        otherColumns.forEach(header => {
+            newRow[header] = row[header] || '';
+        });
+        
+        // Add regular keyword columns with proper naming
+        const regularKeywords = regularKeywordLists[rowIndex];
+        for (let i = 0; i < maxRegularKeywords; i++) {
+            const keyHeader = i === 0 ? keywordsCol : `${keywordsCol}_${i + 1}`;
+            newRow[keyHeader] = regularKeywords[i] || '';
+        }
+        
+        // Add hashtag keywords in the final asset_keywords column
+        const hashtagKeywords = hashtagKeywordLists[rowIndex];
+        newRow['asset_keywords'] = hashtagKeywords.length > 0 ? hashtagKeywords.join('@@') : '';
+        
+        return newRow;
+    });
+    
+    return { headers: newHeaders, data: newData, keywordCount: maxRegularKeywords + 1, isArray: false };
+}
+
 function convertKeywords(data, headers, conversionType) {
     // Find keywords column (case insensitive)
     let keywordsCol = null;
@@ -159,6 +232,8 @@ function convertKeywords(data, headers, conversionType) {
     
     if (conversionType === 'numbered') {
         return convertKeywordsNumbered(data, headers, keywordsCol);
+    } else if (conversionType === 'hashtag_separate') {
+        return convertKeywordsHashtagSeparate(data, headers, keywordsCol);
     } else {
         return convertKeywordsSameName(data, headers, keywordsCol);
     }

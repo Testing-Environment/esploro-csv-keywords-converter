@@ -119,6 +119,64 @@ def convert_keywords_format_numbered(input_file, output_file):
     new_df.to_csv(output_file, index=False)
     return max_keywords, len(df)
 
+def convert_keywords_format_hashtag_separate(input_file, output_file):
+    """Convert CSV from @@ delimited keywords with hashtag separation"""
+    
+    # Read the CSV file
+    df = pd.read_csv(input_file)
+    
+    # Find the keywords column (case insensitive)
+    keywords_col = None
+    for col in df.columns:
+        if 'keyword' in col.lower():
+            keywords_col = col
+            break
+    
+    if keywords_col is None:
+        raise ValueError("No keywords column found. Please ensure your CSV has a column containing 'keyword' in its name.")
+    
+    # Split keywords by @@ delimiter and separate hashtag vs regular keywords
+    regular_keyword_lists = []
+    hashtag_keyword_lists = []
+    max_regular_keywords = 0
+    
+    for keywords_str in df[keywords_col]:
+        if pd.isna(keywords_str) or keywords_str == '':
+            all_keywords = []
+        else:
+            all_keywords = [kw.strip() for kw in str(keywords_str).split('@@') if kw.strip()]
+        
+        regular_keywords = []
+        hashtag_keywords = []
+        
+        for kw in all_keywords:
+            if kw.startswith('#'):
+                hashtag_keywords.append(kw)
+            else:
+                regular_keywords.append(kw)
+        
+        regular_keyword_lists.append(regular_keywords)
+        hashtag_keyword_lists.append(hashtag_keywords)
+        max_regular_keywords = max(max_regular_keywords, len(regular_keywords))
+    
+    # Create new dataframe without original keywords column
+    new_df = df.drop(keywords_col, axis=1).copy()
+    
+    # Add numbered regular keyword columns
+    for i in range(max_regular_keywords):
+        if i == 0:
+            col_name = keywords_col
+        else:
+            col_name = f'{keywords_col}_{i+1}'
+        
+        new_df[col_name] = [kw_list[i] if i < len(kw_list) else '' for kw_list in regular_keyword_lists]
+    
+    # Add final asset_keywords column for hashtag keywords
+    new_df['asset_keywords'] = ['@@'.join(hashtag_list) if hashtag_list else '' for hashtag_list in hashtag_keyword_lists]
+    
+    new_df.to_csv(output_file, index=False)
+    return max_regular_keywords + 1, len(df)
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -152,6 +210,8 @@ def upload_file():
             # Convert file
             if conversion_type == 'same_name':
                 max_keywords, total_rows = convert_keywords_format_same_name(input_path, output_path)
+            elif conversion_type == 'hashtag_separate':
+                max_keywords, total_rows = convert_keywords_format_hashtag_separate(input_path, output_path)
             else:
                 max_keywords, total_rows = convert_keywords_format_numbered(input_path, output_path)
             

@@ -162,6 +162,105 @@ def convert_keywords_format_same_name(input_file, output_file):
     print(f"Created {max_keywords} columns all named 'ASSET_KEYWORDS'")
     print(f"Total rows processed: {len(df)}")
 
+def convert_keywords_format_hashtag_separate(input_file, output_file):
+    """
+    Convert CSV from @@ delimited keywords with hashtag separation
+    
+    Args:
+        input_file (str): Path to input CSV file
+        output_file (str): Path to output CSV file
+    """
+    
+    # Read the CSV file
+    df = pd.read_csv(input_file)
+    
+    # Check if ASSET_KEYWORDS column exists
+    if 'ASSET_KEYWORDS' not in df.columns:
+        print("Error: 'ASSET_KEYWORDS' column not found in the CSV file")
+        print(f"Available columns: {list(df.columns)}")
+        return
+    
+    # Split keywords by @@ delimiter and separate hashtag vs regular keywords
+    regular_keyword_lists = []
+    hashtag_keyword_lists = []
+    max_regular_keywords = 0
+    
+    for keywords_str in df['ASSET_KEYWORDS']:
+        if pd.isna(keywords_str) or keywords_str == '':
+            all_keywords = []
+        else:
+            all_keywords = [kw.strip() for kw in str(keywords_str).split('@@') if kw.strip()]
+        
+        regular_keywords = []
+        hashtag_keywords = []
+        
+        for kw in all_keywords:
+            if kw.startswith('#'):
+                hashtag_keywords.append(kw)
+            else:
+                regular_keywords.append(kw)
+        
+        regular_keyword_lists.append(regular_keywords)
+        hashtag_keyword_lists.append(hashtag_keywords)
+        max_regular_keywords = max(max_regular_keywords, len(regular_keywords))
+    
+    # Get columns without ASSET_KEYWORDS and without Unnamed: 0
+    other_columns = [col for col in df.columns if col != 'ASSET_KEYWORDS' and not col.startswith('Unnamed:')]
+    
+    # Create header with numbered regular keyword columns plus final asset_keywords column
+    header = [''] + other_columns
+    for i in range(max_regular_keywords):
+        if i == 0:
+            header.append('ASSET_KEYWORDS')
+        else:
+            header.append(f'ASSET_KEYWORDS_{i+1}')
+    header.append('asset_keywords')  # Final column for hashtag keywords
+    
+    # Write CSV manually
+    with open(output_file, 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.writer(csvfile)
+        
+        # Write header
+        writer.writerow(header)
+        
+        # Write data rows
+        for index, row in df.iterrows():
+            # Start with the first column value, replace NaN with empty string
+            first_col_value = row.iloc[0] if len(row) > 0 else ''
+            if pd.isna(first_col_value):
+                first_col_value = ''
+            row_data = [first_col_value]
+            
+            # Get values for other columns, replace NaN with empty string
+            for col in other_columns:
+                value = row[col]
+                if pd.isna(value):
+                    row_data.append('')
+                else:
+                    row_data.append(value)
+            
+            # Add regular keyword values
+            regular_keywords = regular_keyword_lists[index]
+            for i in range(max_regular_keywords):
+                if i < len(regular_keywords):
+                    row_data.append(regular_keywords[i])
+                else:
+                    row_data.append('')  # Empty string for missing keywords
+            
+            # Add hashtag keywords in final column
+            hashtag_keywords = hashtag_keyword_lists[index]
+            hashtag_value = '@@'.join(hashtag_keywords) if hashtag_keywords else ''
+            row_data.append(hashtag_value)
+            
+            writer.writerow(row_data)
+    
+    print(f"Conversion completed!")
+    print(f"Original file: {input_file}")
+    print(f"Output file: {output_file}")
+    print(f"Maximum regular keywords found: {max_regular_keywords}")
+    print(f"Created {max_regular_keywords} numbered keyword columns + 1 hashtag column")
+    print(f"Total rows processed: {len(df)}")
+
 def preview_conversion(input_file, num_rows=5):
     """
     Preview how the conversion will look for the first few rows
@@ -224,12 +323,13 @@ if __name__ == "__main__":
     # Show preview first
     preview_conversion(input_file, num_rows=3)
     
-    print("\nTwo conversion options available:")
+    print("\nThree conversion options available:")
     print("1. Numbered columns: ASSET_KEYWORDS, ASSET_KEYWORDS_2, ASSET_KEYWORDS_3, etc.")
     print("2. Same name columns: ASSET_KEYWORDS, ASSET_KEYWORDS, ASSET_KEYWORDS, etc.")
+    print("3. Hashtag separation: Regular keywords in numbered columns, hashtag keywords (#psychology, etc.) in final 'asset_keywords' column")
     print()
     
-    choice = input("Which option do you prefer? (1 for numbered, 2 for same name): ")
+    choice = input("Which option do you prefer? (1, 2, or 3): ")
     
     if choice == "1":
         print("\nConverting with numbered columns...")
@@ -239,5 +339,10 @@ if __name__ == "__main__":
         print("\nConverting with same name columns...")
         convert_keywords_format_same_name(input_file, output_file_same_name)
         print(f"\nOutput saved as: {output_file_same_name}")
+    elif choice == "3":
+        output_file_hashtag = "output_hashtag_separated.csv"
+        print("\nConverting with hashtag separation...")
+        convert_keywords_format_hashtag_separate(input_file, output_file_hashtag)
+        print(f"\nOutput saved as: {output_file_hashtag}")
     else:
-        print("Invalid choice. Please run again and select 1 or 2.")
+        print("Invalid choice. Please run again and select 1, 2, or 3.")

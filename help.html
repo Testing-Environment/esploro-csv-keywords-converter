@@ -33,7 +33,17 @@
                 <ol>
                     <li><strong>Same Column Names:</strong> Creates multiple columns all named the same (e.g., "keywords", "keywords", "keywords")</li>
                     <li><strong>Numbered Columns:</strong> Creates numbered columns (e.g., "keywords", "keywords_2", "keywords_3")</li>
+                    <li><strong>Hashtag Separation:</strong> Separates hashtag keywords (starting with #) into a final "asset_keywords" column, while regular keywords are split into numbered columns</li>
                 </ol>
+
+                <h3>Hashtag Processing</h3>
+                <p>When using the "Hashtag Separation" option:</p>
+                <ul>
+                    <li>Keywords starting with # (hashtag keywords like #psychology, #research) are extracted and placed in a final column named "asset_keywords"</li>
+                    <li>Multiple hashtag keywords in the same row are combined with @@ as the separator</li>
+                    <li>Regular keywords (without #) are processed normally into numbered columns</li>
+                    <li>This is useful for separating metadata keywords from content keywords</li>
+                </ul>
 
                 <h3>How to Use</h3>
                 <ol>

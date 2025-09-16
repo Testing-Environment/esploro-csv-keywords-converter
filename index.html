@@ -99,7 +99,7 @@
                             <div class="mb-3">
                                 <label class="form-label"><strong>Conversion Type:</strong></label>
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="conversion_type" value="same_name" id="same_name" checked>
                                             <label class="form-check-label" for="same_name">
@@ -108,12 +108,21 @@
                                             </label>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="conversion_type" value="numbered" id="numbered">
                                             <label class="form-check-label" for="numbered">
                                                 <strong>Numbered Columns</strong><br>
                                                 <small class="text-muted">keywords, keywords_2, keywords_3</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="conversion_type" value="hashtag_separate" id="hashtag_separate">
+                                            <label class="form-check-label" for="hashtag_separate">
+                                                <strong>Hashtag Separation</strong><br>
+                                                <small class="text-muted">#keywords in final column</small>
                                             </label>
                                         </div>
                                     </div>
@@ -183,10 +192,13 @@
         <!-- Examples Section -->
         <div class="row mb-5" id="examples">
             <div class="col-12">
-                <h3 class="text-center mb-4">Example Conversion</h3>
-                <div class="row">
+                <h3 class="text-center mb-4">Example Conversions</h3>
+                
+                <!-- Standard Conversion Example -->
+                <h5 class="text-center mb-3">Standard Conversion (Same Column Names)</h5>
+                <div class="row mb-4">
                     <div class="col-md-6">
-                        <h5 class="text-center">Before (Input)</h5>
+                        <h6 class="text-center">Before (Input)</h6>
                         <div class="table-responsive">
                             <table class="table table-bordered example-table">
                                 <thead class="table-dark">
@@ -212,7 +224,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <h5 class="text-center">After (Output)</h5>
+                        <h6 class="text-center">After (Output)</h6>
                         <div class="table-responsive">
                             <table class="table table-bordered example-table">
                                 <thead class="table-dark">
@@ -238,6 +250,69 @@
                                         <td>word1</td>
                                         <td>word2</td>
                                         <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hashtag Separation Example -->
+                <h5 class="text-center mb-3">Hashtag Separation Example</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-center">Before (Input)</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered example-table">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>ASSET_KEYWORDS</th>
+                                        <th>Title</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>research@@methodology@@#psychology@@#science</td>
+                                        <td>Psychology Study</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>data@@analysis@@#statistics</td>
+                                        <td>Data Analysis</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-center">After (Output)</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered example-table">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>ASSET_KEYWORDS</th>
+                                        <th>ASSET_KEYWORDS_2</th>
+                                        <th>asset_keywords</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Psychology Study</td>
+                                        <td>research</td>
+                                        <td>methodology</td>
+                                        <td>#psychology@@#science</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Data Analysis</td>
+                                        <td>data</td>
+                                        <td>analysis</td>
+                                        <td>#statistics</td>
                                     </tr>
                                 </tbody>
                             </table>
